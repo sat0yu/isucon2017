@@ -1,0 +1,56 @@
+version: '3.6'
+services:
+  ruby:
+    container_name: isucon2017-ruby
+    command: bundle exec puma -p 5000 -t 10
+    build:
+      context: ./webapp/ruby
+      args:
+        RUBY_VERSION: 2.5.3
+    working_dir: /isucon/webapp/ruby
+    volumes:
+      - vendor:/vendor
+      - .:/isucon:cached
+    environment:
+      DATABASE_HOST: mariadb
+    env_file:
+      - env.sh
+    ports:
+      - "5001:5000"
+    depends_on: ["mariadb"]
+    tty: true
+    stdin_open: true
+
+  go:
+    container_name: isucon2017-go
+    command: go run src/isubata/app.go
+    image: golang:1.10.3
+    working_dir: /go
+    volumes:
+      - ./webapp/go:/go:cached
+      - ./webapp/public:/public:cached
+    environment:
+      DATABASE_HOST: mariadb
+    env_file:
+      - env.sh
+    ports:
+      - "5002:5000"
+    depends_on: ["mariadb"]
+    tty: true
+    stdin_open: true
+
+  mariadb:
+    container_name: isucon2017-mariadb
+    image: mariadb:10.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=isubata
+      - MYSQL_USER=isucon
+      - MYSQL_PASSWORD=isucon
+    volumes:
+      - mariadb:/var/lib/mysql
+      - .:/isucon:cached
+
+volumes:
+  mariadb:
+  vendor:
