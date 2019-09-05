@@ -731,7 +731,7 @@ func main() {
 	}
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secretonymoris"))))
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "request:\"${method} ${uri}\" status:${status} latency:${latency} (${latency_human}) bytes:${bytes_out}\n",
+		Format: "{\"time\":\"${time_rfc3339}\",\"host\":\"${host}\",\"status\":${status},\"uri\":\"${uri}\",\"response_time\":${latency},\"body_bytes\":${bytes_out},\"method\":\"${method}\"}\n",
 	}))
 	e.Use(middleware.Static("../public"))
 
